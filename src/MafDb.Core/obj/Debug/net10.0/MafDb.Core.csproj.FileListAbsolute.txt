@@ -1,0 +1,12 @@
+/Volumes/Dane/20_maf_db/src/MafDb.Core/bin/Debug/net10.0/MafDb.Core.deps.json
+/Volumes/Dane/20_maf_db/src/MafDb.Core/bin/Debug/net10.0/MafDb.Core.dll
+/Volumes/Dane/20_maf_db/src/MafDb.Core/bin/Debug/net10.0/MafDb.Core.pdb
+/Volumes/Dane/20_maf_db/src/MafDb.Core/obj/Debug/net10.0/MafDb.Core.csproj.AssemblyReference.cache
+/Volumes/Dane/20_maf_db/src/MafDb.Core/obj/Debug/net10.0/MafDb.Core.GeneratedMSBuildEditorConfig.editorconfig
+/Volumes/Dane/20_maf_db/src/MafDb.Core/obj/Debug/net10.0/MafDb.Core.AssemblyInfoInputs.cache
+/Volumes/Dane/20_maf_db/src/MafDb.Core/obj/Debug/net10.0/MafDb.Core.AssemblyInfo.cs
+/Volumes/Dane/20_maf_db/src/MafDb.Core/obj/Debug/net10.0/MafDb.Core.csproj.CoreCompileInputs.cache
+/Volumes/Dane/20_maf_db/src/MafDb.Core/obj/Debug/net10.0/MafDb.Core.dll
+/Volumes/Dane/20_maf_db/src/MafDb.Core/obj/Debug/net10.0/refint/MafDb.Core.dll
+/Volumes/Dane/20_maf_db/src/MafDb.Core/obj/Debug/net10.0/MafDb.Core.pdb
+/Volumes/Dane/20_maf_db/src/MafDb.Core/obj/Debug/net10.0/ref/MafDb.Core.dll

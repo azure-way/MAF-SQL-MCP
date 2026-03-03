@@ -1,0 +1,7 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/MafDb.ConsoleApp/MafDb.ConsoleApp.csproj" />
+    <Project Path="src/MafDb.Core/MafDb.Core.csproj" />
+    <Project Path="src/MafDb.McpServer/MafDb.McpServer.csproj" />
+  </Folder>
+</Solution>
