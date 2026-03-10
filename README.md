@@ -1,12 +1,13 @@
 # MafDb
 
-A .NET 10 sample that uses the Microsoft Agentic Framework to query a SQL Server database (AdventureWorks) through a natural-language agent.
+A .NET 10 sample that uses the Microsoft Agentic Framework to query SQL Server (AdventureWorks) with a deterministic, LangChain-style SQL workflow.
 
 ## Projects
 
 - `src/MafDb.Core` - agent construction, SQL tools, and session persistence abstractions.
 - `src/MafDb.ConsoleApp` - interactive CLI chat with persisted sessions.
 - `src/MafDb.McpServer` - MCP server exposing the database agent as a tool over stdio.
+- `tests/MafDb.Core.Tests` - unit tests for workflow, validation, context selection, and cache behavior.
 
 ## Prerequisites
 
@@ -28,6 +29,24 @@ Required keys:
 Additional key for `MafDb.ConsoleApp` session persistence:
 
 - `SqlServer:PersistenceConnectionString`
+
+Memory configuration (selective memory + fallback):
+
+- `Memory:Mode = StateGraph|FullHistory` (default `StateGraph`)
+- `Memory:RecentWindowSize = 8`
+- `Memory:MaxPinnedFacts = 6`
+- `Memory:MaxRetrievedTurns = 3`
+- `Memory:ContextTokenBudget = 2500`
+- `Memory:SummaryTokenBudget = 800`
+- `Memory:EnableFallbackOnError = true`
+
+Workflow configuration (deterministic SQL pipeline):
+
+- `Workflow:Mode = Deterministic|ToolCalling` (default `Deterministic`)
+- `Workflow:MaxRepairRetries = 3`
+- `Workflow:SchemaCacheTtlMinutes = 30`
+- `Workflow:ReturnSqlInUserText = false`
+- `Workflow:FailClosedOnValidation = true`
 
 Recommended: keep secrets out of committed `appsettings.json` and provide them via environment variables or secret management.
 
@@ -69,12 +88,28 @@ dotnet run --project src/MafDb.McpServer
 
 The server runs over stdio transport and exposes `AskDatabaseAgent`.
 
+## Runtime Workflow
+
+Default runtime (`Memory:Mode=StateGraph`, `Workflow:Mode=Deterministic`) uses:
+
+1. Load persisted conversation state
+2. Load/refresh session schema cache
+3. Classify intent and select relevant memory context
+4. Generate structured SQL plan (JSON)
+5. Validate SQL (`SELECT`/`WITH` only, no multi-statement or mutating keywords)
+6. Execute SQL
+7. Retry repair loop on SQL errors (max 3)
+8. Compose natural-language answer
+9. Persist updated state/diagnostics
+
+Compatibility mode (`Memory:Mode=FullHistory` or `Workflow:Mode=ToolCalling`) uses legacy full-history tool-calling behavior.
+
 ## Safety Notes
 
-- SQL execution is intended for read-only usage.
-- The agent instructions restrict generated SQL to `SELECT` statements.
-- Query execution is wrapped in a transaction that is rolled back.
-- Tool output is limited to 100 rows.
+- SQL execution is read-only by design.
+- Deterministic SQL validator rejects non-`SELECT`/`WITH`, multi-statement, and mutating SQL.
+- Query execution uses rollback transaction semantics.
+- Result output is capped at 100 rows.
 
 ## Quality Gates
 
@@ -91,4 +126,5 @@ dotnet format --verify-no-changes
 
 - `scripts/` - utility SQL scripts
 - `backup/` - sample AdventureWorks backup
+- `tests/` - workflow and guardrail tests
 - `MafDb.slnx` - solution entry point
