@@ -4,4 +4,7 @@
     <Project Path="src/MafDb.Core/MafDb.Core.csproj" />
     <Project Path="src/MafDb.McpServer/MafDb.McpServer.csproj" />
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/MafDb.Core.Tests/MafDb.Core.Tests.csproj" />
+  </Folder>
 </Solution>

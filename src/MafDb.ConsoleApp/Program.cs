@@ -1,6 +1,4 @@
 using MafDb.Core;
-using MafDb.Core.Persistence;
-using Microsoft.Agents.AI;
 using Microsoft.Extensions.Configuration;
 
 var config = new ConfigurationBuilder()
@@ -8,37 +6,24 @@ var config = new ConfigurationBuilder()
     .AddEnvironmentVariables()
     .Build();
 
-var persistenceConnectionString = config["SqlServer:PersistenceConnectionString"]
+_ = config["SqlServer:PersistenceConnectionString"]
     ?? config["SqlServer:ConnectionString"]
     ?? throw new InvalidOperationException("Missing SqlServer:ConnectionString configuration.");
 
 var databaseAgent = new DatabaseAgent(config);
-var agent = databaseAgent.Agent;
-
-// Session persistence (SQL-backed, same database)
-ISessionStore sessionStore = new SqlSessionStore(persistenceConnectionString);
 
 Console.WriteLine("=== SQL Database Agent (AdventureWorks) ===");
 Console.WriteLine("Enter session ID to resume, or press Enter for a new session:");
 Console.Write("> ");
 var sessionIdInput = Console.ReadLine()?.Trim();
 
-string sessionId;
-AgentSession session;
+var sessionId = string.IsNullOrEmpty(sessionIdInput)
+    ? Guid.NewGuid().ToString("N")
+    : sessionIdInput;
 
-if (!string.IsNullOrEmpty(sessionIdInput) && await sessionStore.ExistsAsync(sessionIdInput))
-{
-    sessionId = sessionIdInput;
-    var savedState = await sessionStore.LoadAsync(sessionId);
-    session = await agent.DeserializeSessionAsync(savedState!.Value);
-    Console.WriteLine($"Resumed session: {sessionId}");
-}
-else
-{
-    sessionId = Guid.NewGuid().ToString("N");
-    session = await agent.CreateSessionAsync();
-    Console.WriteLine($"New session: {sessionId}");
-}
+Console.WriteLine(string.IsNullOrEmpty(sessionIdInput)
+    ? $"New session: {sessionId}"
+    : $"Using session: {sessionId}");
 
 Console.WriteLine();
 Console.WriteLine($"Session ID: {sessionId}");
@@ -62,15 +47,12 @@ while (true)
 
     try
     {
-        var response = await agent.RunAsync(userInput, session);
-        var text = response.Text;
+        var result = await databaseAgent.AskWithDiagnosticsAsync(userInput, sessionId);
+        var text = result.Answer;
+        sessionId = result.SessionId;
         Console.WriteLine();
         Console.WriteLine($"Agent> {text}");
         Console.WriteLine();
-
-        // Persist session after each turn
-        var serialized = await agent.SerializeSessionAsync(session);
-        await sessionStore.SaveAsync(sessionId, serialized);
     }
     catch (Exception ex)
     {
