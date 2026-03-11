@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using Azure;
 using Azure.AI.OpenAI;
 using Azure.Identity;
 using MafDb.Core.Memory.Models;
@@ -36,7 +37,7 @@ public sealed class DatabaseAgent
         var connectionString = configuration["SqlServer:ConnectionString"]
             ?? throw new InvalidOperationException("Missing SqlServer:ConnectionString configuration.");
 
-        var azureClient = new AzureOpenAIClient(new Uri(endpoint), new DefaultAzureCredential());
+        var azureClient = CreateAzureOpenAiClient(configuration, endpoint);
         ChatClient chatClient = azureClient.GetChatClient(deploymentName);
 
         var tools = new List<AITool>
@@ -219,5 +220,14 @@ public sealed class DatabaseAgent
             ReturnSqlInUserText = BoolOrDefault(configuration["Workflow:ReturnSqlInUserText"], false),
             FailClosedOnValidation = BoolOrDefault(configuration["Workflow:FailClosedOnValidation"], true)
         };
+    }
+
+    private static AzureOpenAIClient CreateAzureOpenAiClient(IConfiguration configuration, string endpoint)
+    {
+        var apiKey = configuration["AzureOpenAI:ApiKey"];
+        if (!string.IsNullOrWhiteSpace(apiKey))
+            return new AzureOpenAIClient(new Uri(endpoint), new AzureKeyCredential(apiKey));
+
+        return new AzureOpenAIClient(new Uri(endpoint), new DefaultAzureCredential());
     }
 }

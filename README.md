@@ -25,6 +25,7 @@ Required keys:
 
 - `AzureOpenAI:Endpoint`
 - `AzureOpenAI:DeploymentName`
+- `AzureOpenAI:ApiKey` (optional; if empty, RBAC via `DefaultAzureCredential` is used)
 - `SqlServer:ConnectionString`
 
 Additional key for `MafDb.ConsoleApp` session persistence:
