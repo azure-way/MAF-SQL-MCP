@@ -7,6 +7,7 @@ A .NET 10 sample that uses the Microsoft Agentic Framework to query SQL Server (
 - `src/MafDb.Core` - agent construction, SQL tools, and session persistence abstractions.
 - `src/MafDb.ConsoleApp` - interactive CLI chat with persisted sessions.
 - `src/MafDb.McpServer` - MCP server exposing the database agent as a tool over stdio.
+- `src/MafDb.DevUIHost` - ASP.NET Core host exposing DevUI frontend at `/devui`.
 - `tests/MafDb.Core.Tests` - unit tests for workflow, validation, context selection, and cache behavior.
 
 ## Prerequisites
@@ -87,6 +88,16 @@ dotnet run --project src/MafDb.McpServer
 ```
 
 The server runs over stdio transport and exposes `AskDatabaseAgent`.
+
+### DevUI frontend
+
+```bash
+dotnet run --project src/MafDb.DevUIHost
+```
+
+Then open:
+
+- `http://localhost:5000/devui` (or the URL shown in console)
 
 ## Runtime Workflow
 
